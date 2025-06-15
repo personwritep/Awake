@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.3
+// @version        2.4
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -368,7 +368,7 @@ function count_do(){
     function page_count(){
         let line_count=0;
         let num_count=0;
-        let p_count=document.querySelectorAll('.p-accessGraphItem__count');
+        let p_count=document.querySelectorAll('.p-accessAnalysisGraphListItem__count');
         for(let k=0; k<p_count.length; k++){
             line_count+=1;
             let line_item_disp=p_count[k].textContent.replace(/[^0-9]/g, '');
