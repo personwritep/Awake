@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.4
+// @version        2.5
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -13,7 +13,7 @@
 // ==/UserScript==
 
 
-let path=document.location.pathname;
+let path=location.pathname;
 if(path=='/ucs/top.do'){ // 管理トップ で実行
 
     let realtime=document.querySelector('.accessAnalysis__dailyAccess');
@@ -61,7 +61,7 @@ if(path=='/ucs/top.do'){ // 管理トップ で実行
     let access_ghtitle=document.querySelector('.accessAnalysis__graphHeadingTitle h3');
     if(access_ghtitle){
         let mag=
-            '<input class="gh_mag" type="number" min="100" max="1000" step="50" value="100">'+
+            '<input class="gh_mag" type="number" min="100" max="1000" step="10" value="100">'+
             '<style>'+
             '#contents .accessAnalysis__graphDrawingArea { '+
             'margin-top: 6px; overflow: hidden; position: relative; } '+
@@ -165,9 +165,11 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
     page_change();
 
     function page_change(){
-        let path=document.location.pathname;
+        let path=location.pathname;
+        let search=location.search;
+
         if(path.includes('analysis.do')){ // アクセス解析トップ
-            clear_disp();
+            clear_page_count();
             setTimeout(()=>{
                 new_report2();
                 new_report_rank2();
@@ -214,12 +216,23 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
         } // アクセス解析トップ
 
 
+
         if(path.includes('analysis_page.do')){ // 記事別アクセス数ページ
             let target=document.querySelector('#root section');
-            let monitor=new MutationObserver(count_do);
+            let monitor=new MutationObserver(auto_count);
             monitor.observe(target, { childList: true });
 
-            count_do();
+            function auto_count(){
+                if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
+                    count_do(); }}
+
+        } // 記事別アクセス数ページ
+
+
+
+        if(path.includes('analysis_page_detail.do')){ // 記事別 詳細解析ページ
+            clear_page_count();
+
         } // 記事別アクセス数ページ
 
     } // page_change()
@@ -259,14 +272,7 @@ function new_report_rank1(){
         document.querySelector('.accessAnalysis__summaryRankingGenreAllRankNumber');
     if(GAnum){
         compare+=GAnum.textContent; }
-    let ORnum=
-        document.querySelector('.accessAnalysis__summaryRankingOfficialRelatedRankNumber');
-    if(ORnum){
-        compare+=ORnum.textContent; }
-    let OAnum=
-        document.querySelector('.accessAnalysis__summaryRankingOfficialAllRankNumber');
-    if(OAnum){
-        compare+=OAnum.textContent; }
+
 
     // 以下のチェックを起動ごとに行う
     let last=get_cookie('Awake_last');
@@ -285,11 +291,7 @@ function new_report_rank1(){
         let panel_G=document.querySelector('.accessAnalysis__summaryRankingGenre');
         if(panel_G){
             panel_G.style.filter='hue-rotate(45deg)';
-            panel_G.style.background='#fff'; }
-        let panel_O=document.querySelector('.accessAnalysis__summaryRankingOfficial');
-        if(panel_O){
-            panel_O.style.filter='hue-rotate(45deg)';
-            panel_O.style.background='#fff'; }}
+            panel_G.style.background='#fff'; }}
 
 
     function get_cookie(name){
@@ -347,7 +349,7 @@ function new_report_rank2(){
 
 
 function count_do(){
-    clear_disp();
+    clear_page_count();
 
     let retry=0;
     let interval=setInterval(more_open, 1000);
@@ -390,7 +392,7 @@ function count_do(){
         if(document.querySelector('#add_access')){
             document.querySelector('#add_access').remove(); }
         let ucsContent=document.querySelector('#ucsContent');
-        if(ucsContent){
+        if(ucsContent && line_count>0){
             ucsContent.insertAdjacentHTML('beforeend', disp); }
 
         let add_access=document.querySelector('#add_access');
@@ -408,6 +410,6 @@ function count_do(){
 
 
 
-function clear_disp(){
+function clear_page_count(){
     if(document.querySelector('#add_access')){
         document.querySelector('#add_access').remove(); }}
