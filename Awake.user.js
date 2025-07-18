@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.5
+// @version        2.6
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -224,7 +224,10 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
             function auto_count(){
                 if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
-                    count_do(); }}
+                    count_do(); }
+
+                if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のベージのみ
+                    open_do(); }}
 
         } // 記事別アクセス数ページ
 
@@ -413,3 +416,12 @@ function count_do(){
 function clear_page_count(){
     if(document.querySelector('#add_access')){
         document.querySelector('#add_access').remove(); }}
+
+
+
+function open_do(){
+    let more=document.querySelector('.p-accessGraph__moreLinkBtn--center');
+    if(more){
+        more.click();
+        setTimeout(()=>{
+            more.click(); }, 600); }}
