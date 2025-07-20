@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.6
+// @version        2.7
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -219,15 +219,17 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
         if(path.includes('analysis_page.do')){ // 記事別アクセス数ページ
             let target=document.querySelector('#root section');
-            let monitor=new MutationObserver(auto_count);
+            let monitor=new MutationObserver(analysis_page_set);
             monitor.observe(target, { childList: true });
 
-            function auto_count(){
+            function analysis_page_set(){
                 if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
-                    count_do(); }
+                    today_page_count(); }
 
                 if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のベージのみ
-                    open_do(); }}
+                    order_page_set(); }
+                else{
+                    to_orderpage(); }}
 
         } // 記事別アクセス数ページ
 
@@ -240,7 +242,6 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
     } // page_change()
 } // アクセス解析ページ全体
-
 
 
 
@@ -351,7 +352,7 @@ function new_report_rank2(){
 
 
 
-function count_do(){
+function today_page_count(){
     clear_page_count();
 
     let retry=0;
@@ -409,7 +410,7 @@ function count_do(){
                     add_access.style.top='58px'; }}}
 
     } // page_count()
-} // count_do()
+} // today_page_count()
 
 
 
@@ -419,9 +420,36 @@ function clear_page_count(){
 
 
 
-function open_do(){
+function order_page_set(){
     let more=document.querySelector('.p-accessGraph__moreLinkBtn--center');
     if(more){
         more.click();
         setTimeout(()=>{
-            more.click(); }, 600); }}
+            more.click(); }, 600); }
+
+    let returnB=document.querySelector('.c-returnButton');
+    if(returnB){
+        returnB.setAttribute('href', '/ucs/analysis/analysis.do?unit=today');
+        returnB.onclick=()=>{
+            location.href='/ucs/analysis/analysis.do?unit=today'; }}
+
+} // order_page_set()
+
+
+
+function to_orderpage(){
+    let returnB=document.querySelector('.c-returnButton');
+    if(returnB){
+        let go_order=
+            '<a class="c-returnButton order" href="/ucs/analysis/analysis_page.do?'+
+            'order=organic_click_desc&amp;unit=thirty_days">検索流入が多い記事の一覧 '+
+            '<i aria-hidden="true" class="c-returnButton__icon s s-triangle-right"></i></a>'+
+            '<style>'+
+            '.c-returnButton { display: inline-block; margin: 10px 20px 10px 0; }</style>';
+
+        if(!document.querySelector('.order')){
+            returnB.insertAdjacentHTML('afterend', go_order); }}
+
+} // to_orderpage()
+
+
