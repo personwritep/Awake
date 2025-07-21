@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.7
+// @version        2.8
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -168,6 +168,8 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
         let path=location.pathname;
         let search=location.search;
 
+        set_selectday();
+
         if(path.includes('analysis.do')){ // アクセス解析トップ
             clear_page_count();
             setTimeout(()=>{
@@ -218,9 +220,9 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
 
         if(path.includes('analysis_page.do')){ // 記事別アクセス数ページ
-            let target=document.querySelector('#root section');
-            let monitor=new MutationObserver(analysis_page_set);
-            monitor.observe(target, { childList: true });
+            let target1=document.querySelector('#root section');
+            let monitor1=new MutationObserver(analysis_page_set);
+            monitor1.observe(target1, { childList: true });
 
             function analysis_page_set(){
                 if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
@@ -242,6 +244,31 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
     } // page_change()
 } // アクセス解析ページ全体
+
+
+
+function set_selectday(){
+    setTimeout(()=>{
+        let target2=document.querySelector('.c-radioSelect');
+        if(target2){
+            check();
+            let monitor2=new MutationObserver(check);
+            monitor2.observe(target2, { subtree: true, characterData: true }); }
+
+        function check(){
+            let select=target2.querySelector('.c-radioSelect__button');
+            if(select.textContent=='今日'){
+                select.style.outlineOffset='';
+                select.style.outline=''; }
+            else if(select.textContent=='-' || select.textContent=='昨日'){
+                select.style.outlineOffset='-1px';
+                select.style.outline='1px solid #2196f3'; }
+            else{
+                select.style.outlineOffset='-1px';
+                select.style.outline='2px solid #2196f3'; }}
+
+    }, 400);
+} // set_selectday()
 
 
 
