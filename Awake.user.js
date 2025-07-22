@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.8
+// @version        2.9
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -395,6 +395,11 @@ function today_page_count(){
             more.click(); }
         if(!more){
             clearInterval(interval);
+            today_only(); }}
+
+
+    function today_only(){
+        if(location.search.includes('unit=today')){
             page_count(); }}
 
 
@@ -454,11 +459,42 @@ function order_page_set(){
         setTimeout(()=>{
             more.click(); }, 600); }
 
+
     let returnB=document.querySelector('.c-returnButton');
     if(returnB){
         returnB.setAttribute('href', '/ucs/analysis/analysis.do?unit=today');
         returnB.onclick=()=>{
             location.href='/ucs/analysis/analysis.do?unit=today'; }}
+
+
+    document.oncontextmenu=function(event){
+        if(!event.shiftKey && !event.ctrlKey){ //「+Ctrl」「+Shift」で通常の右クリック操作
+            let elem=document.elementFromPoint(event.clientX, event.clientY);
+            let link_elem=elem.closest('a');
+            if(link_elem.classList.contains('_1ulb2')){
+                event.preventDefault();
+                clear_set();
+                link_elem.style.outline='1px solid #2196f3';
+                link_elem.style.outlineOffset='-1px'; }}}
+
+
+    document.onmousedown=function(event){
+        clear_set();
+        let links=document.querySelectorAll('._1ulb2');
+        for(let k=0; k<links.length; k++){
+            links[k].onclick=function(event){
+                event.preventDefault();
+                let link=links[k].getAttribute('href');
+                window.open(link, '_blank'); // 別タブで開く
+                links[k].style.outline='1px solid #2196f3';
+                links[k].style.outlineOffset='-1px'; }}}
+
+
+    function clear_set(){
+        let links=document.querySelectorAll('._1ulb2');
+        for(let k=0; k<links.length; k++){
+            links[k].style.outline='';
+            links[k].style.outlineOffset=''; }}
 
 } // order_page_set()
 
