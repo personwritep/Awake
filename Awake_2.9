@@ -395,6 +395,11 @@ function today_page_count(){
             more.click(); }
         if(!more){
             clearInterval(interval);
+            today_only(); }}
+
+
+    function today_only(){
+        if(location.search.includes('unit=today')){
             page_count(); }}
 
 
