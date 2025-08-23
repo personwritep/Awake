@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        2.9
+// @version        3.0
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -231,7 +231,8 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
                 if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のベージのみ
                     order_page_set(); }
                 else{
-                    to_orderpage(); }}
+                    to_orderpage();
+                    open_entry(); }}
 
         } // 記事別アクセス数ページ
 
@@ -351,8 +352,7 @@ function new_report2(){
 
         if(day==yesterday){
             let access_panel=document.querySelector('.p-analysisSummary');
-            access_panel.style.background='#fff';
-        }}}
+            access_panel.style.background='#fff'; }}}
 
 
 
@@ -514,5 +514,61 @@ function to_orderpage(){
             returnB.insertAdjacentHTML('afterend', go_order); }}
 
 } // to_orderpage()
+
+
+
+function open_entry(){
+    document.addEventListener('mousedown', function(event){
+        if(event.shiftKey){ //「Shift+Click」
+            all_item_bar(0);
+            to_entry(event); }});
+
+    document.addEventListener('keydown', function(event){
+        if(event.shiftKey){
+            all_item_bar(1); }});
+
+    document.addEventListener('keyup', function(event){
+        if(!event.shiftKey){
+            all_item_bar(0); }});
+
+
+
+    function to_entry(event){
+        let elem=document.elementFromPoint(event.clientX, event.clientY);
+        if(elem){
+            let link=elem.closest('.p-accessAnalysisGraphListItem__link');
+            if(link){
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                let link_href=link.getAttribute('href');
+                if(link_href){
+                    let index=link_href.indexOf('id=');
+                    let entry_id=link_href.substring(index+3, index+14);
+
+                    let user_id;
+                    let user=document.querySelector('.amebaId');
+                    if(user){
+                        user_id=user.textContent; }
+
+                    if(entry_id && user_id){
+                        let entry_url='https://ameblo.jp/'+ user_id +'/entry-'+ entry_id +'.html';
+                        window.open(entry_url); }
+                }}}
+
+    } // to_entry(event)
+
+
+
+    function all_item_bar(n){
+        let paG=document.querySelector('.p-accessGraph__graph');
+        if(paG){
+            if(n==0){
+                paG.style.boxShadow=''; }
+            else{
+                paG.style.boxShadow='-17px 0 0 -9px #cfd8dc'; }}
+
+    } // all_item_bar(n)
+
+} // open_entry()
 
 
