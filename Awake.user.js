@@ -215,6 +215,16 @@ if(path.includes('analysis')){ // アクセス解析ページ全体
 
                 realtime.insertAdjacentHTML('afterbegin', style_icon); }
 
+
+            setTimeout(()=>{
+                let more=document.querySelector(
+                    '.p-accessGraph__1Column .p-accessGraph__moreLinkBtn');
+                if(more){
+                    more.innerHTML=
+                        '記事別：　アクセス数が多い記事'+
+                        '<i aria-hidden="true" class="p-accessGraph__linkIcon s s-triangle-right"></i>'; }
+            },200);
+
         } // アクセス解析トップ
 
 
@@ -570,5 +580,4 @@ function open_entry(){
     } // all_item_bar(n)
 
 } // open_entry()
-
 
