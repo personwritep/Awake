@@ -169,7 +169,7 @@ if(path.includes('analysis')){ // アクセス解析全体
         let search=location.search;
 
         set_selectday();
-        breadcrumb_top()
+        breadcrumb_top();
 
         if(path.includes('analysis.do')){ // アクセス解析トップ
             clear_page_count();
