@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.0
+// @version        3.1
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
 // @match        https://blog.ameba.jp/ucs/top*
+// @match        https://blog.ameba.jp/analysis*
 // @icon        https://www.google.com/s2/favicons?sz=64&domain=ameba.jp
 // @grant        none
 // @updateURL        https://github.com/personwritep/Awake/raw/main/Awake.user.js
@@ -14,7 +15,17 @@
 
 
 let path=location.pathname;
-if(path=='/ucs/top.do'){ // 管理トップ で実行
+
+if(path.includes('analysis/meta-title')){ // 検索表示タイトルの設定・編集
+    breadcrumb_top();
+    breadcrumb_sub();
+
+} // 検索表示タイトルの設定・編集
+
+
+
+
+if(path=='/ucs/top.do'){ // 管理トップ
 
     let realtime=document.querySelector('.accessAnalysis__dailyAccess');
     if(realtime){
@@ -77,18 +88,25 @@ if(path=='/ucs/top.do'){ // 管理トップ で実行
 
     setTimeout(()=>{
         graph_mag();
-    }, 500); // ページを開いてからのタイミング
+    }, 500);
+
 
     setTimeout(()=>{
         new_report1();
         new_report_rank1();
-    }, 500); // ページを開いてからのタイミング
+    }, 500);
+
+
+    setTimeout(()=>{
+        breadcrumb_ucs_top();
+    }, 500);
+
 
     setTimeout(()=>{
         counter_bar();
     }, 2000);
 
-} // 管理トップ で実行
+} // 管理トップ
 
 
 
@@ -156,6 +174,18 @@ function graph_mag(){
 
 
 
+function breadcrumb_ucs_top(){
+    let acc_link=document.querySelector('.accessAnalysis__seoEntryHeaderRight a');
+    if(acc_link){
+        let link=acc_link.getAttribute('href');
+        if(link){
+            link+='&breadcrumbType=show';
+            acc_link.setAttribute('href', link); }}
+
+} // breadcrumb_ucs_top()
+
+
+
 
 if(path.includes('analysis')){ // アクセス解析全体
     let target0=document.querySelector('#root > div');
@@ -171,12 +201,13 @@ if(path.includes('analysis')){ // アクセス解析全体
         set_selectday();
         breadcrumb_top();
 
+
         if(path.includes('analysis.do')){ // アクセス解析トップ
             clear_page_count();
             setTimeout(()=>{
                 new_report2();
                 new_report_rank2();
-            }, 500); // ページを開いてからのタイミング
+            }, 500);
 
 
             let realtime=document.querySelector('.p-realtimeAccess');
@@ -230,6 +261,7 @@ if(path.includes('analysis')){ // アクセス解析全体
 
 
 
+
         if(path.includes('analysis_page.do')){ // アクセス数が多い記事
             setTimeout(()=>{
                 let target1=document.querySelector('#root section');
@@ -253,8 +285,10 @@ if(path.includes('analysis')){ // アクセス解析全体
 
 
 
+
         if(path.includes('analysis_page_detail.do')){ // 検索パフォーマンス・検索キーワード
             clear_page_count();
+            breadcrumb_sub();
 
         } // 検索パフォーマンス・検索キーワード
 
@@ -297,10 +331,40 @@ function breadcrumb_top(){
             if(top){
                 let link=top.getAttribute('href');
                 if(link=='/ucs/analysis/analysis.do'){
-                    top.setAttribute('href', '/ucs/analysis/analysis.do?unit=today'); }}}
+                    top.setAttribute('href', '/ucs/analysis/analysis.do?unit=today');
+                    top.onmousedown=()=>{
+                        location.href='/ucs/analysis/analysis.do?unit=today'; }}
+            }}
     }, 400);
 
 } // breadcrumb_top()
+
+
+
+function breadcrumb_sub(){
+    setTimeout(()=>{
+        let breadc=document.querySelector('.spui-Breadcrumb');
+        if(breadc){
+            let sub=breadc.querySelectorAll('.spui-Breadcrumb-item a')[1];
+            if(sub){
+                let link=sub.getAttribute('href');
+                if(link.includes('order=organic_click_desc')){ // 検索流入が多い記事
+                    sub.setAttribute(
+                        'href', '/ucs/analysis/analysis_page.do?order=organic_click_desc'+
+                        '&unit=thirty_days&breadcrumbType=show');
+                    sub.onmousedown=()=>{
+                        location.href='/ucs/analysis/analysis_page.do?order=organic_click_desc'+
+                            '&unit=thirty_days&breadcrumbType=show'; }}
+                else{ // アクセス数が多い記事
+                    sub.setAttribute(
+                        'href', '/ucs/analysis/analysis_page.do?unit=today'+
+                        '&breadcrumbType=show');
+                    sub.onmousedown=()=>{
+                        location.href='/ucs/analysis/analysis_page.do?unit=today'+
+                            '&breadcrumbType=show'; }}}}
+    }, 400);
+
+} // breadcrumb_sub()
 
 
 
@@ -544,9 +608,11 @@ function open_entry(){
             all_item_bar(0);
             to_entry(event); }});
 
+
     document.addEventListener('keydown', function(event){
         if(event.shiftKey){
             all_item_bar(1); }});
+
 
     document.addEventListener('keyup', function(event){
         if(!event.shiftKey){
