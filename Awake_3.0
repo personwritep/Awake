@@ -169,6 +169,7 @@ if(path.includes('analysis')){ // アクセス解析全体
         let search=location.search;
 
         set_selectday();
+        breadcrumb_top()
 
         if(path.includes('analysis.do')){ // アクセス解析トップ
             clear_page_count();
@@ -230,17 +231,23 @@ if(path.includes('analysis')){ // アクセス解析全体
 
 
         if(path.includes('analysis_page.do')){ // アクセス数が多い記事
-            let target1=document.querySelector('#root section');
-            let monitor1=new MutationObserver(analysis_page_set);
-            monitor1.observe(target1, { childList: true });
+            setTimeout(()=>{
+                let target1=document.querySelector('#root section');
+                let monitor1=new MutationObserver(analysis_page_set);
+                monitor1.observe(target1, { childList: true });
 
-            analysis_page_set();
+                analysis_page_set();
 
-            function analysis_page_set(){
-                open_entry();
+                function analysis_page_set(){
+                    open_entry();
 
-                if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
-                    today_page_count(); }}
+                    if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
+                        today_page_count(); }
+
+                    if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のみ
+                        order_page_set(); }}
+
+            }, 400);
 
         } // アクセス数が多い記事
 
@@ -279,6 +286,21 @@ function set_selectday(){
     }, 400);
 
 } // set_selectday()
+
+
+
+function breadcrumb_top(){
+    setTimeout(()=>{
+        let breadc=document.querySelector('.spui-Breadcrumb');
+        if(breadc){
+            let top=breadc.querySelector('.spui-Breadcrumb-item a');
+            if(top){
+                let link=top.getAttribute('href');
+                if(link=='/ucs/analysis/analysis.do'){
+                    top.setAttribute('href', '/ucs/analysis/analysis.do?unit=today'); }}}
+    }, 400);
+
+} // breadcrumb_top()
 
 
 
@@ -457,6 +479,7 @@ function today_page_count(){
                     add_access.style.top='58px'; }}}
 
     } // page_count()
+
 } // today_page_count()
 
 
@@ -464,6 +487,54 @@ function today_page_count(){
 function clear_page_count(){
     if(document.querySelector('#add_access')){
         document.querySelector('#add_access').remove(); }}
+
+
+
+function order_page_set(){
+    let more=document.querySelector('.p-accessGraph__moreLinkBtn--center');
+    if(more){
+        more.click();
+        setTimeout(()=>{
+            more.click(); }, 600); }
+
+
+    let returnB=document.querySelector('.c-returnButton');
+    if(returnB){
+        returnB.setAttribute('href', '/ucs/analysis/analysis.do?unit=today');
+        returnB.onclick=()=>{
+            location.href='/ucs/analysis/analysis.do?unit=today'; }}
+
+
+    document.oncontextmenu=function(event){
+        if(!event.shiftKey && !event.ctrlKey){ //「+Ctrl」「+Shift」で通常の右クリック操作
+            let elem=document.elementFromPoint(event.clientX, event.clientY);
+            let link_elem=elem.closest('a');
+            if(link_elem.classList.contains('_1ulb2')){
+                event.preventDefault();
+                clear_set();
+                link_elem.style.outline='1px solid #2196f3';
+                link_elem.style.outlineOffset='-1px'; }}}
+
+
+    document.onmousedown=function(event){
+        clear_set();
+        let links=document.querySelectorAll('._1ulb2');
+        for(let k=0; k<links.length; k++){
+            links[k].onclick=function(event){
+                event.preventDefault();
+                let link=links[k].getAttribute('href');
+                window.open(link, '_blank'); // 別タブで開く
+                links[k].style.outline='1px solid #2196f3';
+                links[k].style.outlineOffset='-1px'; }}}
+
+
+    function clear_set(){
+        let links=document.querySelectorAll('._1ulb2');
+        for(let k=0; k<links.length; k++){
+            links[k].style.outline='';
+            links[k].style.outlineOffset=''; }}
+
+} // order_page_set()
 
 
 
@@ -480,7 +551,6 @@ function open_entry(){
     document.addEventListener('keyup', function(event){
         if(!event.shiftKey){
             all_item_bar(0); }});
-
 
 
     function to_entry(event){
@@ -506,7 +576,6 @@ function open_entry(){
                 }}}
 
     } // to_entry(event)
-
 
 
     function all_item_bar(n){
