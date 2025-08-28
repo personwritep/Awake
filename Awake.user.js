@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.1
+// @version        3.2
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -36,7 +36,8 @@ if(path=='/ucs/top.do'){ // 管理トップ
                     'https://blog.ameba.jp/ucs/analysis/analysis.do?unit=today'; }
             else{
                 window.location.href=
-                    'https://blog.ameba.jp/ucs/analysis/analysis_page.do?unit=today'; }}
+                    'https://blog.ameba.jp/ucs/analysis/analysis_page.do?unit=today'+
+                    '&breadcrumbType=show'; }}
 
         document.onkeydown=function(event){
             if(event.shiftKey){
@@ -190,7 +191,8 @@ function breadcrumb_ucs_top(){
 if(path.includes('analysis')){ // アクセス解析全体
     let target0=document.querySelector('#root > div');
     let monitor0=new MutationObserver(page_change);
-    monitor0.observe(target0, { childList: true });
+    if (target0) {
+        monitor0.observe(target0, { childList: true }); }
 
     page_change();
 
@@ -218,7 +220,8 @@ if(path.includes('analysis')){ // アクセス解析全体
                         window.location.href='https://blog.ameba.jp/ucs/top.do'; }
                     else{
                         window.location.href=
-                            'https://blog.ameba.jp/ucs/analysis/analysis_page.do?unit=today'; }}
+                            'https://blog.ameba.jp/ucs/analysis/analysis_page.do?unit=today'+
+                            '&breadcrumbType=show'; }}
 
                 document.onkeydown=function(event){
                     if(event.shiftKey){
@@ -262,24 +265,15 @@ if(path.includes('analysis')){ // アクセス解析全体
 
 
 
-        if(path.includes('analysis_page.do')){ // アクセス数が多い記事
+        if(path.includes('analysis_page.do')){ // アクセス数が多い記事・「検索流入が多い記事」
             setTimeout(()=>{
-                let target1=document.querySelector('#root section');
-                let monitor1=new MutationObserver(analysis_page_set);
-                monitor1.observe(target1, { childList: true });
+                if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
+                    today_page_count();
+                    open_entry(); }
 
-                analysis_page_set();
-
-                function analysis_page_set(){
-                    open_entry();
-
-                    if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
-                        today_page_count(); }
-
-                    if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のみ
-                        order_page_set(); }}
-
-            }, 400);
+                if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のみ
+                    order_page_set(); }
+            }, 200);
 
         } // アクセス数が多い記事
 
@@ -555,25 +549,21 @@ function clear_page_count(){
 
 
 function order_page_set(){
-    let more=document.querySelector('.p-accessGraph__moreLinkBtn--center');
+    let more=document.querySelector('.p-accessGraph__moreLinkBtn');
     if(more){
         more.click();
+        more.disabled=true;
         setTimeout(()=>{
-            more.click(); }, 600); }
+            more.disabled=false;
+        }, 600); }
 
-
-    let returnB=document.querySelector('.c-returnButton');
-    if(returnB){
-        returnB.setAttribute('href', '/ucs/analysis/analysis.do?unit=today');
-        returnB.onclick=()=>{
-            location.href='/ucs/analysis/analysis.do?unit=today'; }}
 
 
     document.oncontextmenu=function(event){
         if(!event.shiftKey && !event.ctrlKey){ //「+Ctrl」「+Shift」で通常の右クリック操作
             let elem=document.elementFromPoint(event.clientX, event.clientY);
             let link_elem=elem.closest('a');
-            if(link_elem.classList.contains('_1ulb2')){
+            if(link_elem && link_elem.classList.contains('_1ulb2')){
                 event.preventDefault();
                 clear_set();
                 link_elem.style.outline='1px solid #2196f3';
