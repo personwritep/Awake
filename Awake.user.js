@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.2
+// @version        3.3
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -306,9 +306,11 @@ function set_selectday(){
                 select.style.outlineOffset='';
                 select.style.outline=''; }
             else if(select.textContent=='-' || select.textContent=='昨日'){
+                clear_page_count();
                 select.style.outlineOffset='-1px';
                 select.style.outline='1px solid #2196f3'; }
             else{
+                clear_page_count();
                 select.style.outlineOffset='-1px';
                 select.style.outline='2px solid #2196f3'; }}
     }, 400);
