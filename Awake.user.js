@@ -513,14 +513,17 @@ function today_page_count(){
             '<div id="add_access">'+
             '参照された記事数：'+ line_count +'　アクセス数合計：'+ num_count +
             '<style>'+
-            '#add_access { position: absolute; top: 58px; right: 32px; '+
+            '.u-clearfix { position: relative; } '+
+            '#add_access { position: absolute; top: 10px; right: 32px; '+
             'padding: 4px 15px 2px; font: normal 16px Meiryo; z-index: 10; '+
             'border: 1px solid #009688; background: #fff; '+
-            'box-shadow: 2px 3px 6px rgb(170, 170, 170,  0.4); }';
+            'box-shadow: 2px 3px 6px rgb(170, 170, 170,  0.4); } '+
+            '#add_access.sc { position: fixed; top: 8px; right: calc(50% - 465px); }';
         if(line_count==100){
             disp+=
                 '#add_access { border: 1px solid red; }'; }
         disp+='</style></div>';
+
 
         if(document.querySelector('#add_access')){
             document.querySelector('#add_access').remove(); }
@@ -528,15 +531,16 @@ function today_page_count(){
         if(ucsContent && line_count>0){
             ucsContent.insertAdjacentHTML('beforeend', disp); }
 
+
         let add_access=document.querySelector('#add_access');
         window.addEventListener("scroll", scroll);
         function scroll(){
             let scroll_position=window.pageYOffset;
             if(add_access){
-                if(scroll_position>100){
-                    add_access.style.top=(scroll_position - 42)+'px'; }
+                if(scroll_position>42){
+                    add_access.classList.add('sc'); }
                 else{
-                    add_access.style.top='58px'; }}}
+                    add_access.classList.remove('sc'); }}}
 
     } // page_count()
 
