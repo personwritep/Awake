@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.3
+// @version        3.4
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -19,6 +19,16 @@ let path=location.pathname;
 if(path.includes('analysis/meta-title')){ // 検索表示タイトルの設定・編集
     breadcrumb_top();
     breadcrumb_sub();
+
+    setTimeout(()=>{
+        let breadc=document.querySelector('.spui-Breadcrumb');
+        if(breadc){
+            let third=breadc.querySelectorAll('.spui-Breadcrumb-item a')[2];
+            if(third && third.textContent=='検索表示タイトルの設定・編集'){
+                third.onclick=()=>{
+                    breadcrumb_top();
+                    breadcrumb_sub(); }}}
+    },200);
 
 } // 検索表示タイトルの設定・編集
 
