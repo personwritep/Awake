@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.4
+// @version        3.5
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -568,10 +568,17 @@ function order_page_set(){
     let more=document.querySelector('.p-accessGraph__moreLinkBtn');
     if(more){
         more.click();
-        more.disabled=true;
-        setTimeout(()=>{
-            more.disabled=false;
-        }, 600); }
+        d_click(more);
+
+        function d_click(sw){
+            sw.addEventListener('mouseup', (event)=>{
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                setTimeout(()=>{
+                    sw.click();
+                }, 800); }); }
+
+    } // if(more)
 
 
 
