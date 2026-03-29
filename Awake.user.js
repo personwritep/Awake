@@ -304,14 +304,14 @@ if(path.includes('analysis')){ // アクセス解析全体
 
 function set_selectday(){
     setTimeout(()=>{
-        let target2=document.querySelector('.c-radioSelect');
-        if(target2){
+        let target1=document.querySelector('.c-radioSelect');
+        if(target1){
             check();
-            let monitor2=new MutationObserver(check);
-            monitor2.observe(target2, { subtree: true, characterData: true }); }
+            let monitor1=new MutationObserver(check);
+            monitor1.observe(target1, { subtree: true, characterData: true }); }
 
         function check(){
-            let select=target2.querySelector('.c-radioSelect__button');
+            let select=target1.querySelector('.c-radioSelect__button');
             if(select.textContent=='今日'){
                 select.style.outlineOffset='';
                 select.style.outline=''; }
@@ -568,15 +568,32 @@ function order_page_set(){
     let more=document.querySelector('.p-accessGraph__moreLinkBtn');
     if(more){
         more.click();
-        d_click(more);
+        more.disabled=true;
+        setTimeout(()=>{
+            more.disabled=false;
+        }, 600);
 
-        function d_click(sw){
-            sw.addEventListener('mouseup', (event)=>{
-                event.preventDefault();
-                event.stopImmediatePropagation();
+
+        more.onmouseup=()=>{
+            let target2=document.querySelector('.p-accessGraph__graph ul');
+            let monitor2=new MutationObserver(auto);
+            monitor2.observe(target2, { childList: true });
+
+            auto();
+
+            function auto(){
+                more.click();
+                more.disabled=true;
                 setTimeout(()=>{
-                    sw.click();
-                }, 800); }); }
+                    more.disabled=false;
+                }, 100); }
+
+
+            setTimeout(()=>{
+                monitor2.disconnect();
+            }, 8000);
+
+        } // more.onmouseup
 
     } // if(more)
 
