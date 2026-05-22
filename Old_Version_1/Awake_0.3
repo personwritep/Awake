@@ -1,0 +1,106 @@
+// ==UserScript==
+// @name         Awake
+// @namespace    http://tampermonkey.net/
+// @version      0.3
+// @description  アクセスレポートの更新を背景色で知らせる・解析ページを「今日」で開く
+// @author       Ameba Blog User
+// @match        https://blog.ameba.jp/ucs/analysis*
+// @match        https://blog.ameba.jp/ucs/top*
+// @grant        none
+// ==/UserScript==
+
+
+let path=document.location.pathname;
+if(path=='/ucs/top.do'){ // 管理トップの場合だけ解析ページのリンクを変更
+
+    let ana_link=document.querySelector('.l-ucs-sidemenu-area a[href*="analysis.do"]');
+    if(ana_link){
+        ana_link.setAttribute('href', 'https://blog.ameba.jp/ucs/analysis/analysis.do?unit=today'); }
+
+
+    setTimeout(()=>{
+        let access_title=document.querySelector('.p-analysisSummary__access__title');
+        if(access_title){
+            let accsess_text=access_title.textContent.match(/\(.*\)/).toString();
+            let day=accsess_text.match(/\/.*/).toString().replace(/[^0-9]/g, '');
+
+            let date=new Date();
+            date.setDate(date.getDate() -1); // 昨日の日付を取得
+            let yesterday=date.getDate();
+
+            if(day==yesterday){
+                let access_panel=document.querySelector('.p-analysisSummary');
+                access_panel.style.boxShadow='inset 265px 0px 0 0px #d7f2ff'; }}
+    }, 500); // ページを開いてからのタイミング
+
+} // 管理トップページの場合
+
+
+if(path.indexOf('analysis_page.do')!==-1){ // 記事別アクセス数ページ
+
+    let target=document.querySelector('#root section');
+    let monitor=new MutationObserver(count_do);
+    monitor.observe(target, { childList: true });
+
+    count_do();
+
+    function count_do(){
+        clear_disp();
+
+        let retry=0;
+        let interval=setInterval(more_open, 1000);
+        function more_open(){
+            retry++;
+            if(retry>20){ // リトライ制限 20回 4sec
+                clearInterval(interval);
+                alert("全てのリスト情報を開かずに合計しました"); }
+
+            let more=document.querySelector('.p-accessGraph__moreLinkBtn--center');
+
+            if(more){
+                more.click(); }
+            if(!more){
+                clearInterval(interval);
+                main(); }}
+
+
+        function main(){
+            let line_count=0;
+            let num_count=0;
+            let p_count=document.querySelectorAll('.p-accessGraphItem__count');
+            for(let k=0; k<p_count.length; k++){
+                line_count+=1;
+                let line_item_disp=p_count[k].textContent.replace(/[^0-9]/g, '');
+                num_count+=parseInt(line_item_disp, 10); }
+
+            let disp=document.createElement('div');
+            disp.setAttribute("id", 'add_access');
+            disp.innerHTML='参照された記事数：'+ line_count +'　アクセス数合計：'+ num_count;
+
+            let style=document.createElement('style');
+            style.innerHTML=
+                '#add_access { position: fixed; top: 56px; right: 20%;  z-index: 10; '+
+                'padding: 6px 15px 4px; font: normal 16px Meiryo; border: 1px solid #009688; '+
+                'box-shadow: 2px 3px 6px rgb(170, 170, 170,  0.6); background: #fff; }';
+
+            disp.appendChild(style);
+
+            clear_disp();
+            document.querySelector('body').appendChild(disp);
+
+        } // main()
+
+
+        let return_button=document.querySelector('.c-returnButton');
+        if(return_button){
+            return_button.onclick=function(){
+                clear_disp(); }}
+
+
+        function clear_disp(){
+            if(document.querySelector('#add_access')){
+                document.querySelector('#add_access').remove(); }}
+
+    } // count_do()
+
+} // 記事別アクセス数ページ
