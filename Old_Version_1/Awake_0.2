@@ -1,0 +1,36 @@
+// ==UserScript==
+// @name         Awake
+// @namespace    http://tampermonkey.net/
+// @version      0.2
+// @description  アクセスレポートの更新を背景色で知らせる・解析ページを「今日」で開く
+// @author       Ameba Blog User
+// @match        https://blog.ameba.jp/ucs/analysis*
+// @match        https://blog.ameba.jp/ucs/top*
+// @grant        none
+// ==/UserScript==
+
+
+setTimeout(()=>{
+    let path=document.location.pathname;
+    if(path=='/ucs/top.do'){ // 管理トップの場合だけ解析ページのリンクを変更
+        let ana_link=document.querySelector('.l-ucs-sidemenu-area a[href*="analysis.do"]');
+        if(ana_link){
+            ana_link.setAttribute('href', 'https://blog.ameba.jp/ucs/analysis/analysis.do?unit=today'); }}
+}, 200);
+
+
+
+setTimeout(()=>{
+    let access_title=document.querySelector('.p-analysisSummary__access__title');
+    if(access_title){
+        let accsess_text=access_title.textContent.match(/\(.*\)/).toString();
+        let day=accsess_text.match(/\/.*/).toString().replace(/[^0-9]/g, '');
+
+        let date=new Date();
+        date.setDate(date.getDate() -1); // 昨日の日付を取得
+        let yesterday=date.getDate();
+
+        if(day==yesterday){
+            let access_panel=document.querySelector('.p-analysisSummary');
+            access_panel.style.boxShadow='inset 265px 0px 0 0px #d7f2ff'; }}
+}, 500); // ページを開いてからのタイミング
