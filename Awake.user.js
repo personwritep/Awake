@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.6
+// @version        3.7
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -277,8 +277,8 @@ if(path.includes('analysis')){ // アクセス解析全体
 
         if(path.includes('analysis_page.do')){ // アクセス数が多い記事・「検索流入が多い記事」
             setTimeout(()=>{
-                if(search.includes('unit=today')){ //「今日」のデータを開いた時に限る
-                    today_page_count();
+                if(search.includes('unit=')){ // アクセス数が多い記事
+                    page_count_total();
                     open_entry(); }
 
                 if(search.includes('order=organic_click_desc')){ //「検索流入が多い記事」のみ
@@ -486,7 +486,7 @@ function new_report_rank2(){
 
 
 
-function today_page_count(){
+function page_count_total(){
     clear_page_count();
 
     let retry=0;
@@ -502,12 +502,8 @@ function today_page_count(){
             more.click(); }
         if(!more){
             clearInterval(interval);
-            today_only(); }}
-
-
-    function today_only(){
-        if(location.search.includes('unit=today')){
             page_count(); }}
+
 
 
     function page_count(){
@@ -521,40 +517,22 @@ function today_page_count(){
 
         let disp=
             '<div id="add_access">'+
-            '参照された記事数：'+ line_count +'　アクセス数合計：'+ num_count +
+            '参照記事数：'+ line_count +'　アクセス数合計：'+ num_count +
             '<style>'+
-            '.u-clearfix { position: relative; } '+
-            '#add_access { position: absolute; top: 10px; right: 32px; '+
-            'padding: 4px 15px 2px; font: normal 16px Meiryo; z-index: 10; '+
-            'border: 1px solid #009688; background: #fff; '+
-            'box-shadow: 2px 3px 6px rgb(170, 170, 170,  0.4); } '+
-            '#add_access.sc { position: fixed; top: 8px; right: calc(50% - 465px); }';
-        if(line_count==100){
-            disp+=
-                '#add_access { border: 1px solid red; }'; }
-        disp+='</style></div>';
+            '.p-accessGraph__head { position: relative; } '+
+            '#add_access { position: absolute ; top: 3px; right: 80px; '+
+            'font: normal 14px Meiryo; z-index: 10; } '+
+            '</style></div>';
 
-
-        if(document.querySelector('#add_access')){
-            document.querySelector('#add_access').remove(); }
-        let ucsContent=document.querySelector('#ucsContent');
-        if(ucsContent && line_count>0){
-            ucsContent.insertAdjacentHTML('beforeend', disp); }
-
-
-        let add_access=document.querySelector('#add_access');
-        window.addEventListener("scroll", scroll);
-        function scroll(){
-            let scroll_position=window.pageYOffset;
-            if(add_access){
-                if(scroll_position>42){
-                    add_access.classList.add('sc'); }
-                else{
-                    add_access.classList.remove('sc'); }}}
+        let G_head=document.querySelector('.p-accessGraph__head');
+        if(G_head){
+            if(G_head.querySelector('#add_access')){
+                G_head.querySelector('#add_access').remove(); }
+            G_head.insertAdjacentHTML('beforeend', disp); }
 
     } // page_count()
 
-} // today_page_count()
+} // page_count_total()
 
 
 
