@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.7
+// @version        3.8
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -171,14 +171,19 @@ function graph_mag(){
             graph.style.height=mag+'%';
             document.cookie='Awake_gh_mag='+ mag +'; Max-Age=2592000'; }}
 
+
     function get_cookie(name){
-        let cookie_req=document.cookie.split('; ').find(row=>row.startsWith(name));
-        if(cookie_req){
-            if(cookie_req.split('=')[1]==null){
+        let cookie_req=document.cookie.split(';');
+        for(let k=0; k<cookie_req.length; k++){
+            cookie_req[k]=cookie_req[k].trim(); } // 前後の空白を削除
+
+        let cookie=cookie_req.find(row=>row.startsWith(name+'='));
+        if(cookie){
+            if(cookie.split('=')[1]==null){
                 return 0; }
             else{
-                return cookie_req.split('=')[1]; }}
-        if(!cookie_req){
+                return cookie.split('=')[1]; }}
+        if(!cookie){
             return 0; }}
 
 } // graph_mag()
@@ -430,13 +435,17 @@ function new_report_rank1(){
 
 
     function get_cookie(name){
-        let cookie_req=document.cookie.split('; ').find(row=>row.startsWith(name));
-        if(cookie_req){
-            if(cookie_req.split('=')[1]==null){
+        let cookie_req=document.cookie.split(';');
+        for(let k=0; k<cookie_req.length; k++){
+            cookie_req[k]=cookie_req[k].trim(); } // 前後の空白を削除
+
+        let cookie=cookie_req.find(row=>row.startsWith(name+'='));
+        if(cookie){
+            if(cookie.split('=')[1]==null){
                 return 0; }
             else{
-                return cookie_req.split('=')[1]; }}
-        if(!cookie_req){
+                return cookie.split('=')[1]; }}
+        if(!cookie){
             return 0; }}
 
 } // new_report_rank1()
