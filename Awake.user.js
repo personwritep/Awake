@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.8
+// @version        3.9
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -61,7 +61,7 @@ if(path=='/ucs/top.do'){ // 管理トップ
         let style_icon=
             '<div class="bar_g">'+
             '<style>'+
-            '.bar_g { position: absolute; top: 14px; right: 15px; width: 14px; height: 110px; '+
+            '.bar_g { position: absolute; top: 10px; right: 15px; width: 14px; height: 110px; '+
             'border: 1px solid #bbb; } '+
             '.bar_g:before { content: "前日"; display: block; font-size: 12px; line-height: 0; '+
             'margin: 70px 0 0; border-top: 1px solid #bbb; text-indent: -27px; } '+
