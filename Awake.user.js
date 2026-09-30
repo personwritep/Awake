@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        3.9
+// @version        4.0
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -61,10 +61,10 @@ if(path=='/ucs/top.do'){ // 管理トップ
         let style_icon=
             '<div class="bar_g">'+
             '<style>'+
-            '.bar_g { position: absolute; top: 10px; right: 15px; width: 14px; height: 110px; '+
+            '.bar_g { position: absolute; top: 14px; right: 15px; width: 14px; height: 110px; '+
             'border: 1px solid #bbb; } '+
             '.bar_g:before { content: "前日"; display: block; font-size: 12px; line-height: 0; '+
-            'margin: 70px 0 0; border-top: 1px solid #bbb; text-indent: -27px; } '+
+            'margin: 30px 0 0; border-top: 1px solid #bbb; text-indent: -27px; } '+
             '.accessAnalysis__dailyAccess { position: relative; outline-offset: -1px; } '+
             '.accessAnalysis__dailyAccess:before { position: absolute; top: 2px; left: 12px; '+
             'font-family: ameba-symbols; font-size: 32px; '+
@@ -109,11 +109,6 @@ if(path=='/ucs/top.do'){ // 管理トップ
 
 
     setTimeout(()=>{
-        breadcrumb_ucs_top();
-    }, 500);
-
-
-    setTimeout(()=>{
         counter_bar();
     }, 2000);
 
@@ -137,7 +132,7 @@ function counter_bar(){
 
         let bar_css;
         if(c-g!=0){
-            let bar_height=Math.round(40*c/(c-g));
+            let bar_height=Math.round(80*c/(c-g));
             bar_css='.bar_g { box-shadow: inset 0 -'+ bar_height +'px #35c6d6; }'; }
         else{ // 前日のカウント0の場合
             bar_css='.bar_g { box-shadow: inset 0 -110px #eee; }'; }
@@ -187,18 +182,6 @@ function graph_mag(){
             return 0; }}
 
 } // graph_mag()
-
-
-
-function breadcrumb_ucs_top(){
-    let acc_link=document.querySelector('.accessAnalysis__seoEntryHeaderRight a');
-    if(acc_link){
-        let link=acc_link.getAttribute('href');
-        if(link){
-            link+='&breadcrumbType=show';
-            acc_link.setAttribute('href', link); }}
-
-} // breadcrumb_ucs_top()
 
 
 
