@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        4.0
+// @version        4.1
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -85,9 +85,12 @@ if(path=='/ucs/top.do'){ // 管理トップ
         let mag=
             '<input class="gh_mag" type="number" min="100" max="1000" step="10" value="100">'+
             '<style>'+
-            '#contents .accessAnalysis__graphDrawingArea { '+
-            'margin-top: 6px; overflow: hidden; position: relative; } '+
+            '#contents .accessAnalysis__graphHeading { position: relative; z-index: 1; } '+
+            '#contents .accessAnalysis__graphDrawingArea { margin-top: 6px; position: relative; } '+
             '.recharts-responsive-container { position: absolute; bottom: 0; } '+
+            '.mag .yAxis line { clip-path: inset(2px); } '+
+            '.mag .yAxis .recharts-layer:nth-child(n+3) { visibility: hidden; } '+
+            '.mag .recharts-cartesian-grid { visibility: hidden; } '+
             '.gh_mag { width: 50px; text-align: center; padding: 2px 0 1px; '+
             'margin: -10px 20px; vertical-align: -5px; opacity: 0; } '+
             '.gh_mag::-webkit-inner-spin-button { height: 16px; margin-top: 0; } '+
@@ -154,6 +157,7 @@ function graph_mag(){
     if(mag==0){
         mag=100;
         document.cookie='Awake_gh_mag='+ mag +'; Max-Age=2592000'; } // 30日
+    mag_style(mag);
 
     let gh_mag=document.querySelector('.gh_mag');
     let graph=document.querySelector('.recharts-responsive-container');
@@ -164,7 +168,17 @@ function graph_mag(){
         gh_mag.oninput=function(){
             mag=gh_mag.value;
             graph.style.height=mag+'%';
-            document.cookie='Awake_gh_mag='+ mag +'; Max-Age=2592000'; }}
+            document.cookie='Awake_gh_mag='+ mag +'; Max-Age=2592000';
+            mag_style(mag); }}
+
+
+    function mag_style(mag){
+        let graph=document.querySelector('.recharts-responsive-container');
+        if(graph){
+            if(mag/1>100){
+                graph.classList.add('mag'); }
+            else{
+                graph.classList.remove('mag'); }}}
 
 
     function get_cookie(name){
