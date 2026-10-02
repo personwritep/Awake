@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        Awake
 // @namespace        http://tampermonkey.net/
-// @version        4.1
+// @version        4.2
 // @description        アクセスレポートの更新を背景色で表示・解析ページを「今日」で開く
 // @author        Ameba Blog User
 // @match        https://blog.ameba.jp/ucs/analysis*
@@ -87,14 +87,19 @@ if(path=='/ucs/top.do'){ // 管理トップ
             '<style>'+
             '#contents .accessAnalysis__graphHeading { position: relative; z-index: 1; } '+
             '#contents .accessAnalysis__graphDrawingArea { margin-top: 6px; position: relative; } '+
-            '.recharts-responsive-container { position: absolute; bottom: 0; } '+
+            '.recharts-responsive-container { position: absolute; bottom: 0; pointer-events: none; } '+
+            '.accessAnalysis__graphDrawingArea:hover .recharts-responsive-container { '+
+            'pointer-events: auto; } '+
             '.mag .yAxis line { clip-path: inset(2px); } '+
             '.mag .yAxis .recharts-layer:nth-child(n+3) { visibility: hidden; } '+
             '.mag .recharts-cartesian-grid { visibility: hidden; } '+
             '.gh_mag { width: 50px; text-align: center; padding: 2px 0 1px; '+
             'margin: -10px 20px; vertical-align: -5px; opacity: 0; } '+
             '.gh_mag::-webkit-inner-spin-button { height: 16px; margin-top: 0; } '+
-            '.accessAnalysis__graphHeading:hover .gh_mag { opacity: 1; }'+
+            '.accessAnalysis__graphHeading:hover .gh_mag { opacity: 1; } '+
+            '.realtimeAccess .notification:hover, '+
+            '.accessAnalysis__dailyAccess:hover, '+
+            '.accessAnalysis__summary:hover { position: relative; z-index: 1; } '+
             '</style>';
 
         access_ghtitle.insertAdjacentHTML('beforeend', mag); }
@@ -179,6 +184,20 @@ function graph_mag(){
                 graph.classList.add('mag'); }
             else{
                 graph.classList.remove('mag'); }}}
+
+    /*
+    let AA=document.querySelector('.accessAnalysis__dailyAccess');
+    if(AA){
+        AA.addEventListener('mouseover', ()=>{
+            AA.style.zIndex='1'; });
+    }
+*/
+
+
+
+
+
+
 
 
     function get_cookie(name){
